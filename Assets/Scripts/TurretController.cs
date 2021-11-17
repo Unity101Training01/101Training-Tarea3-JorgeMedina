@@ -2,35 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SeekerController : MonoBehaviour
+public class TurretController : MonoBehaviour
 {
-    [SerializeField] float speed;
-    [SerializeField] float maxDistance = 100f;
-    [SerializeField] float sphereRadius = 1f;
+    [SerializeField] float sphereRadius = 10f;
+    [SerializeField] float maxDistance = 1f;
+    [SerializeField] GameObject bullet;
+    [SerializeField] float bulletSpeed = 100f;
 
-    RaycastHit hit;
-    Rigidbody seekerRb;
+    Rigidbody turretRb;
+    Rigidbody bulletRb;
     GameObject player;
-
+    RaycastHit hit;
+    
     void Start()
     {
-        seekerRb =  GetComponent<Rigidbody>();
+        turretRb =  GetComponent<Rigidbody>();
+        bulletRb = bullet.GetComponent<Rigidbody>();
         player = GameObject.Find("Player");
     }
 
     void Update()
     {
-        PlayerOnRadius();
+        PlayerOnSight();
     }
 
-    void PlayerOnRadius()
+    void PlayerOnSight()
     {
         if(Physics.SphereCast(transform.position, sphereRadius, transform.position, out hit, maxDistance) && hit.collider.gameObject.CompareTag("Player"))
         {
             Debug.Log(hit.collider.name);
 
             Vector3 lookDirection = (player.transform.position - transform.position).normalized;
-            seekerRb.AddForce(lookDirection * speed * Time.deltaTime);
+            
+            Instantiate(bullet, transform.position, transform.rotation);
+            bulletRb.AddForce(transform.position * bulletSpeed * Time.deltaTime, ForceMode.Impulse);
         }
     }
 
@@ -40,5 +45,5 @@ public class SeekerController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * maxDistance);
         Gizmos.DrawWireSphere(transform.position + transform.forward * maxDistance, sphereRadius);
-    }
+    }    
 }
