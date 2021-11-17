@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class SeekerController : MonoBehaviour
 {
-    [SerializeField] float speed;
-    [SerializeField] float maxDistance = 100f;
-    [SerializeField] float sphereRadius = 1f;
+    [SerializeField] float speed = 1f;
+    [SerializeField] float sphereRadius = 10f;
 
     RaycastHit hit;
     Rigidbody seekerRb;
@@ -18,27 +17,17 @@ public class SeekerController : MonoBehaviour
         player = GameObject.Find("Player");
     }
 
-    void Update()
+    void FixedUpdate()
     {
         PlayerOnRadius();
     }
 
     void PlayerOnRadius()
     {
-        if(Physics.SphereCast(transform.position, sphereRadius, transform.position, out hit, maxDistance) && hit.collider.gameObject.CompareTag("Player"))
+        if(Vector3.Distance(transform.position, player.transform.position) < sphereRadius)
         {
-            Debug.Log(hit.collider.name);
-
             Vector3 lookDirection = (player.transform.position - transform.position).normalized;
-            seekerRb.AddForce(lookDirection * speed * Time.deltaTime);
+            seekerRb.AddForce(lookDirection * speed * Time.deltaTime, ForceMode.Impulse);
         }
-    }
-
-    void OnDrawGizmos()
-    {
-        // Draw a sphere at the SphereCast's position
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + transform.forward * maxDistance);
-        Gizmos.DrawWireSphere(transform.position + transform.forward * maxDistance, sphereRadius);
     }
 }
